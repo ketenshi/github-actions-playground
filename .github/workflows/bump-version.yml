@@ -92,7 +92,7 @@ jobs:
         id: update-marketing-version
         working-directory: Sources
         run: |
-          auto_version=${{ steps.new-marketing-version-auto.new_marketing_version }}
+          auto_version=${{ steps.new-marketing-version-auto.outputs.new_marketing_version }}
           manual_version=${{ steps.new-marketing-version-manual.outputs.new_marketing_version }}
           
           if [ ! -z $auto_version ]; then
