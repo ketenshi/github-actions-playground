@@ -21,7 +21,8 @@ on:
 jobs:
   bump-version:
     runs-on: macos-latest
-    if: ${{ (github.event.pull_request.merged && github.head_ref == 'code-complete-develop') || github.event.inputs }}
+    if: ${{ github.event.inputs }}
+    #if: ${{ (github.event.pull_request.merged && github.head_ref == 'code-complete-develop') || github.event.inputs }}
 
     steps:
       - uses: actions/checkout@v2
