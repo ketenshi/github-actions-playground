@@ -20,7 +20,7 @@ jobs:
       - name: Get marketing version
         id: marketing-version
         run: |
-          marketing_version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "Sources/Dummy/Dummy/Info.plist")
+          marketing_version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "Sources/Dummy/Info.plist")
 
           echo "Saving marketing version $marketing_version"
           echo "::set-output name=marketing_version::$marketing_version"
