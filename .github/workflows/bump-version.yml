@@ -10,10 +10,6 @@ on:
         description: 'Major Update. Major version corresponds to the last 2 digits of the year'
         required: true
         default: 'false'
-      isMinor:
-        description: 'Minor Update'
-        required: true
-        default: 'false'
       newVersion:
         description: 'New Version'
         required: false
@@ -31,7 +27,7 @@ jobs:
       - name: Get marketing version
         id: marketing-version
         run: |
-          marketing_version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "Sources/Dummy/Dummy/Info.plist")
+          marketing_version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "Sources/Dummy/Info.plist")
 
           echo "Saving new marketing version $marketing_version"
           echo "::set-output name=marketing_version::$marketing_version"
@@ -85,10 +81,8 @@ jobs:
             fi
           elif [ ${{ github.event.inputs.isMajor }} == 'true' ]; then
             new_marketing_version="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1+1 ".0" ".0" }')"
-          elif [ ${{ github.event.inputs.isMinor }} == 'true' ]; then
-            new_marketing_version="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1 "." $2+1 ".0" }')"
           else
-            new_marketing_version="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1 "." $2 "." $3+1 }')"
+            new_marketing_version="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1 "." $2+1 ".0" }')"
           fi
 
           echo "New marketing version is $new_marketing_version"
