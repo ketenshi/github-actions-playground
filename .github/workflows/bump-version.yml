@@ -3,6 +3,7 @@ name: Bump Version
 on:
   pull_request:
     types: [closed]
+    branches: [code-complete-develop]
 
   workflow_dispatch:
     inputs:
@@ -17,7 +18,7 @@ on:
 jobs:
   bump-version:
     runs-on: macos-latest
-    if: ${{ (github.event.pull_request.merged && github.head_ref == 'code-complete-develop') || github.event.inputs }}
+    if: ${{ github.event.pull_request.merged || github.event.inputs }}
 
     steps:
       - uses: actions/checkout@v2
@@ -34,7 +35,7 @@ jobs:
       
       - name: New marketing version (Auto)
         id: new-marketing-version-auto
-        if: ${{ github.event.pull_request.merged && github.head_ref == 'code-complete-develop' }}
+        if: ${{ github.event.pull_request.merged }}
         run: |
           marketing_version=${{ steps.marketing-version.outputs.marketing_version }}
 
