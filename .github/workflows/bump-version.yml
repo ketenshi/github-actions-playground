@@ -3,11 +3,25 @@ name: Bump Version
 on:
   pull_request:
     types: [closed]
+    
+  workflow_dispatch:
+    inputs:
+      isMajor:
+        description: 'Major Update. Major version corresponds to the last 2 digits of the year'
+        required: true
+        default: 'false'
+      isMinor:
+        description: 'Minor Update'
+        required: true
+        default: 'false'
+      newVersion:
+        description: 'New Version'
+        required: false
 
 jobs:
   bump-version:
     runs-on: macos-latest
-    if: ${{ github.event.pull_request.merged && github.head_ref == 'code-complete-develop' }}
+    if: ${{ (github.event.pull_request.merged && github.head_ref == 'code-complete-develop') || github.event.inputs }}
 
     steps:
       - uses: actions/checkout@v2
