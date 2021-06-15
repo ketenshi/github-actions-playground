@@ -3,7 +3,7 @@ name: Bump Version
 on:
   pull_request:
     types: [closed]
-    branches: [code-complete-develop]
+    branches: [release-candidate]
 
   workflow_dispatch:
     inputs:
