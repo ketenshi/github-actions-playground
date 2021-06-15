@@ -21,8 +21,7 @@ on:
 jobs:
   bump-version:
     runs-on: macos-latest
-    if: ${{ github.event.inputs }}
-    #if: ${{ (github.event.pull_request.merged && github.head_ref == 'code-complete-develop') || github.event.inputs }}
+    if: ${{ (github.event.pull_request.merged && github.head_ref == 'code-complete-develop') || github.event.inputs }}
 
     steps:
       - uses: actions/checkout@v2
@@ -34,14 +33,72 @@ jobs:
         run: |
           marketing_version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "Sources/Dummy/Dummy/Info.plist")
 
+          echo "Saving new marketing version $marketing_version"
+          echo "::set-output name=marketing_version::$marketing_version"
+      
+      - name: New marketing version (Auto)
+        id: new-marketing-version-auto
+        if: ${{ github.event.pull_request.merged && github.head_ref == 'code-complete-develop' }}
+        run: |
+          marketing_version=${{ steps.marketing-version.outputs.marketing_version }}
+
           new_marketing_version=$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1 "." $2+1 ".0" }')
 
           echo "Saving new marketing version $new_marketing_version"
           echo "::set-output name=new_marketing_version::$new_marketing_version"
-      
-      - name: Update marketing version
+
+      - name: New marketing version (Manual)
+        id: new-marketing-version-manual
+        if: ${{ github.event.inputs }}
+        run: |
+          marketing_version=${{ steps.marketing-version.outputs.marketing_version }}
+
+          if [ ! -z "${{ github.event.inputs.newVersion }}" ]; then
+            new_marketing_version=${{ github.event.inputs.newVersion }}
+            new_marketing_version="$(echo $new_marketing_version | awk 'BEGIN { FS="." } { print $1+0 "." $2+0 "." $3+0 }')"
+
+            if [ $new_marketing_version == $marketing_version ]; then
+              echo "The new version cannot be the same as the current version $marketing_version"
+              exit 1
+            fi
+
+            major="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1 }')"
+            minor="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $2 }')"
+            patch="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $3 }')"
+            new_major="$(echo $new_marketing_version | awk 'BEGIN { FS="." } { print $1 }')"
+            new_minor="$(echo $new_marketing_version | awk 'BEGIN { FS="." } { print $2 }')"
+            new_patch="$(echo $new_marketing_version | awk 'BEGIN { FS="." } { print $3 }')"
+            
+            if [ $new_major -lt $major ]; then
+              echo "The new version $new_marketing_version cannot be less than the current version $marketing_version"
+              exit 1
+            elif [ $new_major -eq $major ]; then
+              if [ $new_minor -lt $minor ]; then
+                echo "The new version $new_marketing_version cannot be less than the current version $marketing_version"
+                exit 1
+              elif [ $new_minor -eq $minor ]; then
+                if [ $new_patch -lt $patch ]; then
+                  echo "The new version $new_marketing_version cannot be less than the current version $marketing_version"
+                  exit 1
+                fi
+              fi
+            fi
+          elif [ ${{ github.event.inputs.isMajor }} == 'true' ]; then
+            new_marketing_version="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1+1 ".0" ".0" }')"
+          elif [ ${{ github.event.inputs.isMinor }} == 'true' ]; then
+            new_marketing_version="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1 "." $2+1 ".0" }')"
+          else
+            new_marketing_version="$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1 "." $2 "." $3+1 }')"
+          fi
+
+          echo "New marketing version is $new_marketing_version"
+          echo "::set-output name=new_marketing_version::$new_marketing_version"
+
+      - name: UpdateMarketing version
         working-directory: Sources
-        run: agvtool new-marketing-version "${{ steps.marketing-version.outputs.new_marketing_version }}"
+        run: |
+          version=${{ steps.new-marketing-version-auto.new_marketing_version :- steps.new-marketing-version-manual.outputs.new_marketing_version }}
+          agvtool new-marketing-version $version
 
       - name: Create PR
         uses: scorebet/create-pull-request@v3
