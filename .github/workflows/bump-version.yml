@@ -3,7 +3,7 @@ name: Bump Version
 on:
   pull_request:
     types: [closed]
-    
+
   workflow_dispatch:
     inputs:
       isMajor:
@@ -31,7 +31,7 @@ jobs:
       - name: Get marketing version
         id: marketing-version
         run: |
-          marketing_version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "Sources/theScore Bet/Supporting Files/Info.plist")
+          marketing_version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "Sources/Dummy/Dummy/Info.plist")
 
           new_marketing_version=$(echo $marketing_version | awk 'BEGIN { FS="." } { print $1 "." $2+1 ".0" }')
 
