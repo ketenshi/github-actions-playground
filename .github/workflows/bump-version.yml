@@ -94,10 +94,14 @@ jobs:
           echo "New marketing version is $new_marketing_version"
           echo "::set-output name=new_marketing_version::$new_marketing_version"
 
-      - name: UpdateMarketing version
+      - name: Update Marketing version
         working-directory: Sources
         run: |
-          version=${{ steps.new-marketing-version-auto.new_marketing_version :- steps.new-marketing-version-manual.outputs.new_marketing_version }}
+          auto_version=${{ steps.new-marketing-version-auto.new_marketing_version }}
+          manual_version=${{ steps.new-marketing-version-manual.outputs.new_marketing_version }}
+          
+          version="${auto_version:-manual_version}"
+
           agvtool new-marketing-version $version
 
       - name: Create PR
