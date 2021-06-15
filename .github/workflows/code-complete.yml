@@ -2,7 +2,6 @@ name: Code Complete
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
   code-complete:
