@@ -89,14 +89,22 @@ jobs:
           echo "::set-output name=new_marketing_version::$new_marketing_version"
 
       - name: Update Marketing version
+        id: update-marketing-version
         working-directory: Sources
         run: |
           auto_version=${{ steps.new-marketing-version-auto.new_marketing_version }}
           manual_version=${{ steps.new-marketing-version-manual.outputs.new_marketing_version }}
           
-          version="${auto_version:-manual_version}"
+          if [ ! -z $auto_version ]; then
+            version=$auto_version
+          else
+            version=$manual_version
+          fi
 
           agvtool new-marketing-version $version
+
+          echo "Updated version is $version"
+          echo "::set-output name=version::$version"
 
       - name: Create PR
         uses: scorebet/create-pull-request@v3
@@ -104,7 +112,7 @@ jobs:
           labels: Bump version
           branch: bump-version-develop
           base: develop 
-          title: "Bump version v${{ steps.marketing-version.outputs.new_marketing_version }}"
+          title: "Bump version v${{ steps.update-marketing-version.outputs.new_marketing_version }}"
           body: |
             :crown: *An automated PR*
 
