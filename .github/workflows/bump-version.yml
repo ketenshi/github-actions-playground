@@ -112,7 +112,7 @@ jobs:
           labels: Bump version
           branch: bump-version-develop
           base: develop 
-          title: "Bump version v${{ steps.update-marketing-version.outputs.new_marketing_version }}"
+          title: "Bump version v${{ steps.update-marketing-version.outputs.version }}"
           body: |
             :crown: *An automated PR*
 
