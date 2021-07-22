@@ -10,7 +10,6 @@ jobs:
     steps:
       - run: |
           brew install xmlstarlet
-          xml -version
       
       - uses: actions/checkout@v2
         with:
