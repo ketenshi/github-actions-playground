@@ -11,6 +11,9 @@ jobs:
       - run: |
           brew install xmlstarlet
       
+      - run: |
+          xml -version
+          
       - uses: actions/checkout@v2
         with:
           ref: release-candidate
