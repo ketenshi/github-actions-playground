@@ -8,7 +8,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - run: xml -version
+      - run: |
+          brew install xmlstarlet
+          xml -version
       
       - uses: actions/checkout@v2
         with:
